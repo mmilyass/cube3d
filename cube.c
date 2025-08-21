@@ -1,60 +1,79 @@
 #include "cube.h"
 
-void put_square(void *mlx, void *win, int yy, int xx)
+int get_window_size(t_cube *data)
 {
-    int y;
-    int x;
-    int tx;
-    int ty;
+    int fd;
+    char *buffer;
+    int tmp = 0;
 
-    y = yy * 32;
-    ty = y + 32;
-    tx = (xx * 32) + 32;
-    while (y < ty)
+    fd = open("map.ber", O_RDONLY);
+    if (fd < 0)
+        return ERROR;
+    while (1)
     {
-        x = xx * 32;
-        while(x < tx)
+        buffer = get_next_line(fd);
+        if (!buffer)
+            break;
+        lstaddback(&data->map, buffer);
+        tmp = ft_strlen(buffer);
+        if (tmp > data->width)
+            data->width = tmp;
+        data->height++;
+    }
+    close(fd);
+    return 0;
+}
+
+void render_cube(t_cube *data, int y, int x)
+{
+    int start_y;
+    int start_x;
+
+    start_y = y;
+    while (start_y < y + WH)
+    {
+        start_x = x;
+        while (start_x < x + WH)
         {
-            mlx_pixel_put(mlx, win, x, y, 0xFFFFFF);
-            x++;
+            my_pixel_put(data, start_x, start_y, 0xFFFFFF);
+            start_x++;
+        }
+        start_y++;
+    }
+}
+
+int render_map(t_cube *data)
+{
+    int fd;
+    char *buffer;
+    int i;
+    int y = 0;
+
+    fd = open("map.ber", O_RDONLY);
+    if (fd < 0)
+        return ERROR;
+    while (1)
+    {
+        i = 0;
+        buffer = get_next_line(fd);
+        if (!buffer)
+            break;
+        while (buffer[i])
+        {
+            if (buffer[i] == '1')
+                render_cube(data, y * WH, i * WH);
+            i++;
         }
         y++;
     }
+    return 0;
 }
 
 int main()
 {
-    void *mlx;
-    void *win;
-    int x;
-    int y = 0;
-    int map[10][20] = {
-        {1,1,1,1,1,1,1,1,},
-        {1,0,0,0,0,0,0,1,},
-        {1,0,1,0,1,0,0,1,},
-        {1,0,1,0,1,0,0,1,},
-        {1,0,0,0,0,0,0,1,},
-        {1,0,1,1,1,1,0,1,},
-        {1,0,0,0,0,0,0,1,},
-        {1,0,0,0,0,0,0,1,},
-        {1,0,0,0,0,0,0,1,},
-        {1,1,1,1,1,1,1,1,}
-    };
-    mlx = mlx_init();
-    win = mlx_new_window(mlx, 20 * 32, 10 * 32, "ilyass");
-    while (y < 10)
-    {
-        x = 0;
-        while (x < 20)
-        {
-            if (map[y][x] == 1)
-            {
-                printf("%d   %d\n", y, x);
-                put_square(mlx, win, y, x);
-            }
-            x++;
-        }
-        y++;
-    }
-    mlx_loop(mlx);
+    t_cube *data;
+    data = initialize();
+    render_all(data);
+    mlx_hook(data->win, 2, 1L << 0, rotate_line, data);
+    mlx_loop(data->mlx);
 }
