@@ -2,8 +2,7 @@
 
 void add_alloc(t_alloc **head, char *content)
 {
-
-    t_alloc *new = malloc(sizeof(t_alloc));
+    t_alloc *new = calloc(sizeof(t_alloc), 1);
     new->pointer = content;
     new->next = NULL;
     if (*head == NULL)
@@ -35,7 +34,7 @@ void *ft_malloc(size_t bytes, int action)
     if (action == ALLOC)
     {
         void *alloc;
-        alloc = malloc(bytes);
+        alloc = calloc(bytes, 1);
         if (!alloc)
             ft_malloc(0, FREE);
         add_alloc(&head, alloc);

@@ -1,32 +1,66 @@
 #include "cube.h"
 
-void my_pixel_put(t_cube *d, int x, int y, int color)
+void my_pixel_put(t_cube *d, int x, int y, unsigned int color)
 {
+    if (x < 0 || x >= d->width * WH || y < 0 || y >= d->height * WH)
+        return;
+
+    if (!d->addr)
+        return;
     char *dst;
 
     dst = d->addr + (y * d->line_len + x * (d->bpp / 8));
     *(unsigned int *)dst = color;
 }
 
-void draw_line(t_cube *data)
+int check_colisionn(t_cube *data, int x, int y)
 {
+    int i = 0;
+    int j = 0;
+    t_map *current;
+
+    current = data->map;
+    while (current)
+    {
+        i = 0;
+        while (current->row[i])
+        {
+            if (current->row[i] == '1')
+            {
+                if ((x >= i * WH && x <= (i * WH) + WH) &&
+                    (y >= j * WH && y <= (j + 1) * WH))
+                    return -1;
+            }
+            i++;
+        }
+        j++;
+        current = current->next;
+    }
+    return 0;
+}
+
+void draw_line(t_cube *data, double angle)
+{
+    int i = 0;
     int x;
     int y;
-    int i = 0;
-    while (i < 50)
+    while (1)
     {
-        x = data->px + i * cos(data->angle);
-        y = data->py - i * sin(data->angle);
+        x = data->px + (i * cos(angle));
+        y = data->py + (i * sin(angle));
         my_pixel_put(data, x, y, 0xFF0000);
+        if (check_colisionn(data, x, y) == -1)
+            break;
         i++;
     }
+
 }
+
 
 void render_all(t_cube *data)
 {
-    ft_bzero(data->addr, data->line_len * data->height * WH);
     render_map(data);
-    draw_line(data);
+    casting_rays(data);
     mlx_put_image_to_window(data->mlx, data->win, data->img, 0, 0);
 }
 

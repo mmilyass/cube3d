@@ -4,10 +4,11 @@ SRCS = cube.c \
 		get_next_line/get_next_line.c \
 		colision.c \
 		initialize.c \
-		ft_malloc.c
+		ft_malloc.c \
+		cast_rays.c
 
 
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror 
 OBJS = $(SRCS:.c=.o)
 NAME = cube
 

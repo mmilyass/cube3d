@@ -38,7 +38,7 @@ typedef struct s_cube
     int width;
     int height;
     double angle;
-    // double angle_direction;
+    double angle_cast;
     int px;
     int py;
     int pxt;
@@ -60,8 +60,10 @@ void lstaddback(t_map **head, char *content);
 void *ft_malloc(size_t bytes, int action);
 t_cube *initialize();
 int get_window_size(t_cube *data);
-void my_pixel_put(t_cube *data, int x, int y, int color);
+void my_pixel_put(t_cube *data, int x, int y, unsigned int color);
 void render_all(t_cube *data);
+void draw_line(t_cube *data, double angle);
+void casting_rays(t_cube *data);
 // gnl functions!!
 
 unsigned int ft_strlen(char *str);
