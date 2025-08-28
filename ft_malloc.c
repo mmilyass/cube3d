@@ -48,19 +48,3 @@ void *ft_malloc(size_t bytes, int action)
     return (NULL);
 }
 
-void lstaddback(t_map **head, char *content)
-{
-
-    t_map *new = ft_malloc(sizeof(t_map), ALLOC);
-    new->row = content;
-    new->next = NULL;
-    if (*head == NULL)
-    {
-        *head = new;
-        return;
-    }
-    t_map *current = *(head);
-    while (current->next)
-        current = current->next;
-    current->next = new;
-}
